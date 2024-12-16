@@ -9,7 +9,7 @@ public class Main {
             - Option to add headings and table of contents
      */
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         // TODO: temp folder for testing purposes
         final File folder = new File("/Users/mjosefsen/Developer/Java/Dats2300 - Oppgaver");
 

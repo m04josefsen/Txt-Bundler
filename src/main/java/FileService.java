@@ -1,5 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -21,7 +23,7 @@ public class FileService {
     }
 
     // Method to get all files in folder
-    public static void addTxtToQueue(final File folder) {
+    private static void addTxtToQueue(final File folder) {
         logger = Logger.getLogger("FileService");
 
         for(final File fileEntry : folder.listFiles()) {
@@ -44,7 +46,7 @@ public class FileService {
     private static void processTxtFiles(StringBuilder builder) {
         final File file = new File(txtQueue.peek());
 
-        System.out.println("Proccessing file: " + file.getName());
+        // System.out.println("Proccessing file: " + file.getName());
 
         // Scanner reads throught txt file
         try {
@@ -52,6 +54,7 @@ public class FileService {
 
             while(s.hasNextLine()) {
                 builder.append(s.nextLine());
+                builder.append(System.lineSeparator());
             }
 
             s.close();
@@ -60,9 +63,6 @@ public class FileService {
             logger.severe("Error while processing file: " + e.getMessage());
         }
 
-        // TODO: hvis innholdsfortegnelse burde det kanskje bli lagt til før i builderen, og heading må igjen etter det.
-        // innholdsfortegnelse kan bli lagt til på slutt ved å sette sammen to string builders, men må lagre filnavn i Queue, for ritkig rekkefølge.
-
         // Removes txt file from queue, if empty stop recursion
         txtQueue.remove();
         if(!txtQueue.isEmpty()) {
@@ -70,7 +70,20 @@ public class FileService {
         }
 
         if(txtQueue.isEmpty()) {
-            System.out.println(builder.toString());
+            // System.out.println(builder.toString());
+            createTxtFile(builder);
+        }
+    }
+
+    // Creates txt file based on StringBuilder
+    private static void createTxtFile(StringBuilder txtContent) {
+        try {
+            FileWriter file = new FileWriter("navn" + ".txt");
+            file.write(txtContent.toString());
+            file.close();
+        }
+        catch (Exception e) {
+            logger.severe("Error while creating file: " + e.getMessage());
         }
     }
 }

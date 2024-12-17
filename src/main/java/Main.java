@@ -7,6 +7,9 @@ public class Main {
         - Add option to read all subdirectories or just main
         - Add option to create a pdf or txt file bundled
             - Option to add headings and table of contents
+
+        // TODO: hvis innholdsfortegnelse burde det kanskje bli lagt til før i builderen, og heading må igjen etter det.
+        // innholdsfortegnelse kan bli lagt til på slutt ved å sette sammen to string builders, men må lagre filnavn i Queue, for ritkig rekkefølge.
      */
 
     public static void main(String[] args) {

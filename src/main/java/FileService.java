@@ -27,7 +27,7 @@ public class FileService {
         for(final File fileEntry : folder.listFiles()) {
             // If is folder, call method again
             if(fileEntry.isDirectory()) {
-                listFilesForFolder(fileEntry);
+                addTxtToQueue(fileEntry);
             }
             else {
                 // System.out.println(fileEntry.getName());

@@ -1,12 +1,28 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class FileService {
 
+    private static Logger logger;
+    private static Queue<String> txtQueue;
+
+    public static void traverseDirectory(File directory) {
+        logger = Logger.getLogger("FileService");
+
+        txtQueue = new LinkedList<>();
+
+        addTxtToQueue(directory);
+
+        StringBuilder builder = new StringBuilder();
+
+        processTxtFiles(builder);
+    }
+
     // Method to get all files in folder
-    public static void listFilesForFolder(final File folder) throws Exception {
-        Queue<String> queue = new LinkedList<>();
+    public static void addTxtToQueue(final File folder) {
+        logger = Logger.getLogger("FileService");
 
         for(final File fileEntry : folder.listFiles()) {
             // If is folder, call method again
@@ -14,43 +30,47 @@ public class FileService {
                 listFilesForFolder(fileEntry);
             }
             else {
-                System.out.println(fileEntry.getName());
+                // System.out.println(fileEntry.getName());
 
                 if(fileEntry.getName().endsWith(".txt")) {
-                    // TODO: enten save pathen?, eller dataen?, eller prosseser med en gang?
-                    queue.add(fileEntry.getAbsolutePath());
+                    System.out.println(fileEntry.getName());
+                    txtQueue.add(fileEntry.getAbsolutePath());
                 }
             }
         }
-
-        StringBuilder builder = new StringBuilder();
-
-        processTxtFiles(queue, queue.peek(), builder);
     }
 
     // Method to proccess all txt files form listFilesForFolder
-    // TODO: kan a txtFile, kall den en gang, og if allTxtFiles.hasNext hvis dobbelt lenket liste eller .next osv, dvs rekursjon
-    // TODO: metoden kan ta inn en stringbuilder som bygger hele? kanskje memory not efficent
-    private static void processTxtFiles(Queue<String> queue, String path, StringBuilder builder) throws Exception {
-        final File file = new File(path);
-        Scanner s = new Scanner(file);
+    private static void processTxtFiles(StringBuilder builder) {
+        final File file = new File(txtQueue.peek());
+
+        System.out.println("Proccessing file: " + file.getName());
 
         // Scanner reads throught txt file
-        while(s.hasNextLine()) {
-            builder.append(s.nextLine());
+        try {
+            Scanner s = new Scanner(file);
+
+            while(s.hasNextLine()) {
+                builder.append(s.nextLine());
+            }
+
+            s.close();
+        }
+        catch (Exception e) {
+            logger.severe("Error while processing file: " + e.getMessage());
         }
 
-        s.close();
+        // TODO: hvis innholdsfortegnelse burde det kanskje bli lagt til før i builderen, og heading må igjen etter det.
+        // innholdsfortegnelse kan bli lagt til på slutt ved å sette sammen to string builders, men må lagre filnavn i Queue, for ritkig rekkefølge.
 
         // Removes txt file from queue, if empty stop recursion
-        queue.remove();
-        if(!queue.isEmpty()) {
-            processTxtFiles(queue, queue.peek(), builder);
+        txtQueue.remove();
+        if(!txtQueue.isEmpty()) {
+            processTxtFiles(builder);
+        }
+
+        if(txtQueue.isEmpty()) {
+            System.out.println(builder.toString());
         }
     }
-
-
-
-
-
 }

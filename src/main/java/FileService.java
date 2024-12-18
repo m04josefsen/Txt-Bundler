@@ -9,6 +9,7 @@ public class FileService {
 
     private static Logger logger;
     private static Queue<String> txtQueue;
+    private static FileWriter newTxt;
 
     public static void traverseDirectory(File directory) {
         logger = Logger.getLogger("FileService");
@@ -17,9 +18,23 @@ public class FileService {
 
         addTxtToQueue(directory);
 
-        StringBuilder builder = new StringBuilder();
+        try {
+            newTxt = new FileWriter("navn" + ".txt");
+        }
+        catch (Exception e) {
+            logger.severe("Error while creating file: " + e.getMessage());
+        }
 
-        processTxtFiles(builder);
+        processTxtFiles();
+
+        // Closes txt file after creating
+        try {
+            newTxt.close();
+        }
+        catch (Exception e) {
+            logger.severe("Error while closing file: " + e.getMessage());
+        }
+
     }
 
     // Method to get all files in folder
@@ -43,10 +58,12 @@ public class FileService {
     }
 
     // Method to proccess all txt files form listFilesForFolder
-    private static void processTxtFiles(StringBuilder builder) {
+    private static void processTxtFiles() {
         final File file = new File(txtQueue.peek());
 
         // System.out.println("Proccessing file: " + file.getName());
+
+        StringBuilder builder = new StringBuilder();
 
         // Scanner reads throught txt file
         try {
@@ -65,25 +82,20 @@ public class FileService {
 
         // Removes txt file from queue, if empty stop recursion
         txtQueue.remove();
-        if(!txtQueue.isEmpty()) {
-            processTxtFiles(builder);
-        }
+        writeTxtFile(builder);
 
-        if(txtQueue.isEmpty()) {
-            // System.out.println(builder.toString());
-            createTxtFile(builder);
+        if(!txtQueue.isEmpty()) {
+            processTxtFiles();
         }
     }
 
-    // Creates txt file based on StringBuilder
-    private static void createTxtFile(StringBuilder txtContent) {
+    // Writes to txt file based on StringBuilder
+    private static void writeTxtFile(StringBuilder txtContent) {
         try {
-            FileWriter file = new FileWriter("navn" + ".txt");
-            file.write(txtContent.toString());
-            file.close();
+            newTxt.write(txtContent.toString());
         }
         catch (Exception e) {
-            logger.severe("Error while creating file: " + e.getMessage());
+            logger.severe("Error while writing to file: " + e.getMessage());
         }
     }
 }

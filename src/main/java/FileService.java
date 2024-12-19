@@ -7,8 +7,9 @@ import java.util.logging.Logger;
 
 public class FileService {
 
-    private static Logger logger;
+    // Using an ArrayList would be more effective, but fun to use other data structures
     private static Queue<String> txtQueue;
+    private static Logger logger;
     private static FileWriter newTxt;
 
     public static void traverseDirectory(File directory) {
@@ -16,7 +17,6 @@ public class FileService {
         txtQueue = new LinkedList<>();
 
         boolean checkSubdirectories = checkSubdirectories();
-
         addTxtToQueue(directory, checkSubdirectories);
 
         // Initializes new txt file
@@ -27,6 +27,11 @@ public class FileService {
             logger.severe("Error while creating file: " + e.getMessage());
         }
 
+        // TODO: her må jeg gjøre noe, kanskje if true, før process, gå gjennom quene for å lage den basert på filnavn?
+        boolean includeTableOfContents = includeTableOfContents();
+        if(includeTableOfContents) {
+            addTableOfContents();
+        }
         processTxtFiles();
 
         // Closes txt file after creating
@@ -99,29 +104,60 @@ public class FileService {
         }
     }
 
+    // Checks users input if they want to check all subdirectories
     private static boolean checkSubdirectories() {
+        Scanner scanner = new Scanner(System.in);
         try {
-            Scanner scanner = new Scanner(System.in);
-            System.out.println("Do you want to check all subdirectories for txt files? (y/n)");
+            while (true) {
+                System.out.println("Do you want to check all subdirectories for txt files (y/n)");
+                String input = scanner.nextLine().toLowerCase();
 
-            String input = scanner.nextLine();
-
-            if(input.equals("y")) {
-                return true;
-            }
-            else if (input.equals("n")) {
-                return false;
-            }
-            else {
-                // TODO: noe annen check her som looper tilbake
-                return false;
+                if (input.equals("y")) {
+                    return true;
+                } else if (input.equals("n")) {
+                    return false;
+                } else {
+                    System.out.println("Invalid input. Please enter 'y' or 'n'.");
+                }
             }
         }
         catch (Exception e) {
-            // TODO: noe mer check for input ting her
             logger.severe(e.getMessage());
+            return false;
         }
+        finally {
+            scanner.close();
+        }
+    }
 
-        return false;
+    // Checks users input if they want Table of Contents
+    private static boolean includeTableOfContents() {
+        Scanner scanner = new Scanner(System.in);
+        try {
+            while (true) {
+                System.out.println("Do you want to add Table of Contents (y/n)");
+                String input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    return true;
+                } else if (input.equals("n")) {
+                    return false;
+                } else {
+                    System.out.println("Invalid input. Please enter 'y' or 'n'.");
+                }
+            }
+        }
+        catch (Exception e) {
+            logger.severe(e.getMessage());
+            return false;
+        }
+        finally {
+            scanner.close();
+        }
+    }
+
+    // Adds the Table of Contents to file
+    private static void addTableOfContents() {
+
     }
 }

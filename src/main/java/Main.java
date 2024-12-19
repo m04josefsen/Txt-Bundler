@@ -10,6 +10,11 @@ public class Main {
 
         // TODO: hvis innholdsfortegnelse burde det kanskje bli lagt til før i builderen, og heading må igjen etter det.
         // innholdsfortegnelse kan bli lagt til på slutt ved å sette sammen to string builders, men må lagre filnavn i Queue, for ritkig rekkefølge.
+
+        - If txt, table of contents can include line numbers
+        - If pdf, normal table of contents
+
+        - Error if no txt files in (sub)directory(ies)
      */
 
     public static void main(String[] args) {

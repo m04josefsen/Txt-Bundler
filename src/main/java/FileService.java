@@ -13,11 +13,13 @@ public class FileService {
 
     public static void traverseDirectory(File directory) {
         logger = Logger.getLogger("FileService");
-
         txtQueue = new LinkedList<>();
 
-        addTxtToQueue(directory);
+        boolean checkSubdirectories = checkSubdirectories();
 
+        addTxtToQueue(directory, checkSubdirectories);
+
+        // Initializes new txt file
         try {
             newTxt = new FileWriter("navn" + ".txt");
         }
@@ -38,13 +40,11 @@ public class FileService {
     }
 
     // Method to get all files in folder
-    private static void addTxtToQueue(final File folder) {
-        logger = Logger.getLogger("FileService");
-
+    private static void addTxtToQueue(final File folder, boolean checkSubdirectories) {
         for(final File fileEntry : folder.listFiles()) {
             // If is folder, call method again
-            if(fileEntry.isDirectory()) {
-                addTxtToQueue(fileEntry);
+            if(fileEntry.isDirectory() && checkSubdirectories) {
+                addTxtToQueue(fileEntry, true);
             }
             else {
                 // System.out.println(fileEntry.getName());
@@ -97,5 +97,31 @@ public class FileService {
         catch (Exception e) {
             logger.severe("Error while writing to file: " + e.getMessage());
         }
+    }
+
+    private static boolean checkSubdirectories() {
+        try {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Do you want to check all subdirectories for txt files? (y/n)");
+
+            String input = scanner.nextLine();
+
+            if(input.equals("y")) {
+                return true;
+            }
+            else if (input.equals("n")) {
+                return false;
+            }
+            else {
+                // TODO: noe annen check her som looper tilbake
+                return false;
+            }
+        }
+        catch (Exception e) {
+            // TODO: noe mer check for input ting her
+            logger.severe(e.getMessage());
+        }
+
+        return false;
     }
 }

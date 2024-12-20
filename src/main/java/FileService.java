@@ -1,7 +1,5 @@
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -16,7 +14,10 @@ public class FileService {
         logger = Logger.getLogger("FileService");
         txtQueue = new LinkedList<>();
 
-        boolean checkSubdirectories = checkSubdirectories();
+        Scanner scanner = new Scanner(System.in);
+        boolean checkSubdirectories = checkSubdirectories(scanner);
+        boolean includeTableOfContents = includeTableOfContents(scanner);
+
         addTxtToQueue(directory, checkSubdirectories);
 
         // Initializes new txt file
@@ -27,12 +28,12 @@ public class FileService {
             logger.severe("Error while creating file: " + e.getMessage());
         }
 
-        // TODO: her må jeg gjøre noe, kanskje if true, før process, gå gjennom quene for å lage den basert på filnavn?
-        boolean includeTableOfContents = includeTableOfContents();
         if(includeTableOfContents) {
             addTableOfContents();
         }
         processTxtFiles();
+
+        scanner.close();
 
         // Closes txt file after creating
         try {
@@ -41,7 +42,6 @@ public class FileService {
         catch (Exception e) {
             logger.severe("Error while closing file: " + e.getMessage());
         }
-
     }
 
     // Method to get all files in folder
@@ -105,59 +105,54 @@ public class FileService {
     }
 
     // Checks users input if they want to check all subdirectories
-    private static boolean checkSubdirectories() {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            while (true) {
-                System.out.println("Do you want to check all subdirectories for txt files (y/n)");
-                String input = scanner.nextLine().toLowerCase();
+    private static boolean checkSubdirectories(Scanner scanner) {
+        while (true) {
+            System.out.println("Do you want to check all subdirectories for txt files (y/n)");
+            String input = scanner.nextLine().toLowerCase();
 
-                if (input.equals("y")) {
-                    return true;
-                } else if (input.equals("n")) {
-                    return false;
-                } else {
-                    System.out.println("Invalid input. Please enter 'y' or 'n'.");
-                }
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter 'y' or 'n'.");
             }
-        }
-        catch (Exception e) {
-            logger.severe(e.getMessage());
-            return false;
-        }
-        finally {
-            scanner.close();
         }
     }
 
     // Checks users input if they want Table of Contents
-    private static boolean includeTableOfContents() {
-        Scanner scanner = new Scanner(System.in);
-        try {
-            while (true) {
-                System.out.println("Do you want to add Table of Contents (y/n)");
-                String input = scanner.nextLine().toLowerCase();
+    private static boolean includeTableOfContents(Scanner scanner) {
+        while (true) {
+            System.out.println("Do you want to add Table of Contents (y/n)");
+            String input = scanner.nextLine().toLowerCase();
 
-                if (input.equals("y")) {
-                    return true;
-                } else if (input.equals("n")) {
-                    return false;
-                } else {
-                    System.out.println("Invalid input. Please enter 'y' or 'n'.");
-                }
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter 'y' or 'n'.");
             }
-        }
-        catch (Exception e) {
-            logger.severe(e.getMessage());
-            return false;
-        }
-        finally {
-            scanner.close();
         }
     }
 
     // Adds the Table of Contents to file
     private static void addTableOfContents() {
+        Queue<String> tempQueue = new LinkedList<>();
+        StringBuilder builder = new StringBuilder();
 
+        while(!txtQueue.isEmpty()) {
+            tempQueue.add(txtQueue.remove());
+        }
+
+        // Adds files back to original queue and to table of contents
+        while(!tempQueue.isEmpty()) {
+            builder.append(tempQueue.peek());
+            builder.append(System.lineSeparator());
+
+            txtQueue.add(tempQueue.remove());
+        }
+
+        writeTxtFile(builder);
     }
 }

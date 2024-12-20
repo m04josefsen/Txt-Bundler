@@ -62,48 +62,6 @@ public class FileService {
         }
     }
 
-    // Method to proccess all txt files form listFilesForFolder
-    private static void processTxtFiles() {
-        final File file = new File(txtQueue.peek());
-
-        // System.out.println("Proccessing file: " + file.getName());
-
-        StringBuilder builder = new StringBuilder();
-
-        // Scanner reads throught txt file
-        try {
-            Scanner s = new Scanner(file);
-
-            while(s.hasNextLine()) {
-                builder.append(s.nextLine());
-                builder.append(System.lineSeparator());
-            }
-
-            s.close();
-        }
-        catch (Exception e) {
-            logger.severe("Error while processing file: " + e.getMessage());
-        }
-
-        // Removes txt file from queue, if empty stop recursion
-        txtQueue.remove();
-        writeTxtFile(builder);
-
-        if(!txtQueue.isEmpty()) {
-            processTxtFiles();
-        }
-    }
-
-    // Writes to txt file based on StringBuilder
-    private static void writeTxtFile(StringBuilder txtContent) {
-        try {
-            newTxt.write(txtContent.toString());
-        }
-        catch (Exception e) {
-            logger.severe("Error while writing to file: " + e.getMessage());
-        }
-    }
-
     // Checks users input if they want to check all subdirectories
     private static boolean checkSubdirectories(Scanner scanner) {
         while (true) {
@@ -147,12 +105,54 @@ public class FileService {
 
         // Adds files back to original queue and to table of contents
         while(!tempQueue.isEmpty()) {
-            builder.append(tempQueue.peek());
-            builder.append(System.lineSeparator());
+            builder.append(tempQueue.peek() + "\n");
 
             txtQueue.add(tempQueue.remove());
         }
 
         writeTxtFile(builder);
+    }
+
+    // Method to proccess all txt files form listFilesForFolder
+    private static void processTxtFiles() {
+        final File file = new File(txtQueue.peek());
+
+        // System.out.println("Proccessing file: " + file.getName());
+
+        StringBuilder builder = new StringBuilder();
+        // Adds heading to each file part
+        builder.append(txtQueue.peek() + "\n");
+
+        // Scanner reads throught txt file
+        try {
+            Scanner s = new Scanner(file);
+
+            while(s.hasNextLine()) {
+                builder.append(s.nextLine() + "\n");
+            }
+
+            s.close();
+        }
+        catch (Exception e) {
+            logger.severe("Error while processing file: " + e.getMessage());
+        }
+
+        // Removes txt file from queue, if empty stop recursion
+        writeTxtFile(builder);
+        txtQueue.remove();
+
+        if(!txtQueue.isEmpty()) {
+            processTxtFiles();
+        }
+    }
+
+    // Writes to txt file based on StringBuilder
+    private static void writeTxtFile(StringBuilder txtContent) {
+        try {
+            newTxt.append(txtContent.toString() + "\n");
+        }
+        catch (Exception e) {
+            logger.severe("Error while writing to file: " + e.getMessage());
+        }
     }
 }

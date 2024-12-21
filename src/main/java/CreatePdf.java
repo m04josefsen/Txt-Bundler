@@ -10,8 +10,8 @@ import java.io.IOException;
 
 public class CreatePdf {
 
-    public static void createPdf(String txtFilePath) {
-        String pdfFilePath = "/Users/mjosefsen/Developer/Java/TxtBundler/navn.pdf";
+    public static void createPdf(String txtFilePath, String fileName) {
+        String pdfFilePath = "/Users/mjosefsen/Developer/Java/TxtBundler/" + fileName + ".pdf";
         String fontPath = "/Users/mjosefsen/Developer/Java/TxtBundler/src/main/resources/fonts/Noto-sans.ttf";
 
         try (PDDocument document = new PDDocument()) {

@@ -1,7 +1,6 @@
 import java.io.File;
 
 public class Main {
-
     /*
         TODO:
         - Add option to read all subdirectories or just main
@@ -22,5 +21,4 @@ public class Main {
 
         FileService.traverseDirectory(folder);
     }
-
 }

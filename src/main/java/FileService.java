@@ -18,26 +18,24 @@ public class FileService {
         boolean checkSubdirectories = checkSubdirectories(scanner);
         boolean includeTableOfContents = includeTableOfContents(scanner);
         boolean createPdf = createPdf(scanner);
+        String fileName = fileName(scanner);
         scanner.close();
 
         addTxtToQueue(directory, checkSubdirectories);
 
+        CreateTxt createTxt = new CreateTxt();
+
         // Initializes new txt file
         try {
-            newTxt = new FileWriter("navn" + ".txt");
+            newTxt = createTxt.createTxt(includeTableOfContents, txtQueue, fileName);
         }
         catch (Exception e) {
             logger.severe("Error while creating file: " + e.getMessage());
         }
 
-        if(includeTableOfContents) {
-            addTableOfContents();
-        }
-        processTxtFiles();
-
         if(createPdf) {
             // TODO: temp emd absolute path her
-            CreatePdf.createPdf("/Users/mjosefsen/Developer/Java/TxtBundler/navn.txt");
+            CreatePdf.createPdf("/Users/mjosefsen/Developer/Java/TxtBundler/" + fileName + ".txt", fileName);
         }
 
         // Closes txt file after creating
@@ -115,65 +113,11 @@ public class FileService {
         }
     }
 
-    // Adds the Table of Contents to file
-    private static void addTableOfContents() {
-        Queue<String> tempQueue = new LinkedList<>();
-        StringBuilder builder = new StringBuilder();
+    // Checks user input for filename
+    private static String fileName(Scanner scanner) {
+        System.out.println("What do you want to name the file? (do not include .filetype)");
+        String input = scanner.nextLine().toLowerCase();
 
-        while(!txtQueue.isEmpty()) {
-            tempQueue.add(txtQueue.remove());
-        }
-
-        // Adds files back to original queue and to table of contents
-        while(!tempQueue.isEmpty()) {
-            builder.append(tempQueue.peek() + "\n");
-
-            txtQueue.add(tempQueue.remove());
-        }
-
-        writeTxtFile(builder);
-    }
-
-    // Method to proccess all txt files form listFilesForFolder
-    private static void processTxtFiles() {
-        final File file = new File(txtQueue.peek());
-
-        // System.out.println("Proccessing file: " + file.getName());
-
-        StringBuilder builder = new StringBuilder();
-        // Adds heading to each file part
-        builder.append(txtQueue.peek() + "\n");
-
-        // Scanner reads throught txt file
-        try {
-            Scanner s = new Scanner(file);
-
-            while(s.hasNextLine()) {
-                builder.append(s.nextLine() + "\n");
-            }
-
-            s.close();
-        }
-        catch (Exception e) {
-            logger.severe("Error while processing file: " + e.getMessage());
-        }
-
-        // Removes txt file from queue, if empty stop recursion
-        writeTxtFile(builder);
-        txtQueue.remove();
-
-        if(!txtQueue.isEmpty()) {
-            processTxtFiles();
-        }
-    }
-
-    // Writes to txt file based on StringBuilder
-    private static void writeTxtFile(StringBuilder txtContent) {
-        try {
-            newTxt.append(txtContent.toString() + "\n");
-        }
-        catch (Exception e) {
-            logger.severe("Error while writing to file: " + e.getMessage());
-        }
+        return input;
     }
 }

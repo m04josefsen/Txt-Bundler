@@ -17,6 +17,8 @@ public class FileService {
         Scanner scanner = new Scanner(System.in);
         boolean checkSubdirectories = checkSubdirectories(scanner);
         boolean includeTableOfContents = includeTableOfContents(scanner);
+        boolean createPdf = createPdf(scanner);
+        scanner.close();
 
         addTxtToQueue(directory, checkSubdirectories);
 
@@ -33,7 +35,10 @@ public class FileService {
         }
         processTxtFiles();
 
-        scanner.close();
+        if(createPdf) {
+            // TODO: temp emd absolute path her
+            CreatePdf.createPdf("/Users/mjosefsen/Developer/Java/TxtBundler/navn.txt");
+        }
 
         // Closes txt file after creating
         try {
@@ -82,6 +87,22 @@ public class FileService {
     private static boolean includeTableOfContents(Scanner scanner) {
         while (true) {
             System.out.println("Do you want to add Table of Contents (y/n)");
+            String input = scanner.nextLine().toLowerCase();
+
+            if (input.equals("y")) {
+                return true;
+            } else if (input.equals("n")) {
+                return false;
+            } else {
+                System.out.println("Invalid input. Please enter 'y' or 'n'.");
+            }
+        }
+    }
+
+    // Checks users input if they want Table of Contents
+    private static boolean createPdf(Scanner scanner) {
+        while (true) {
+            System.out.println("Do you want to also create a PDF document (y/n)");
             String input = scanner.nextLine().toLowerCase();
 
             if (input.equals("y")) {

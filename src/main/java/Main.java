@@ -11,8 +11,6 @@ public class Main {
         - If pdf, normal table of contents
 
         - Error if no txt files in (sub)directory(ies)
-
-        - TODO: omskriv pdf, pdf tar ikke inn alle karkaterer (eks ÆØÅ),
      */
 
     public static void main(String[] args) {

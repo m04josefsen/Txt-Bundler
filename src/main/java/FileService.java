@@ -22,6 +22,7 @@ public class FileService {
         scanner.close();
 
         addTxtToQueue(directory, checkSubdirectories);
+        // TODO: stopp hvis queue er empty
 
         CreateTxt createTxt = new CreateTxt();
 
@@ -35,7 +36,9 @@ public class FileService {
 
         if(createPdf) {
             // TODO: temp emd absolute path her
-            CreatePdf.createPdf("/Users/mjosefsen/Developer/Java/TxtBundler/" + fileName + ".txt", fileName);
+            String path = "/Users/mjosefsen/Developer/Java/TxtBundler/" + fileName + ".txt";
+
+            CreatePdf.createPdf(path, fileName);
         }
 
         // Closes txt file after creating

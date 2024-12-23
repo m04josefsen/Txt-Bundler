@@ -9,52 +9,60 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class CreatePdf {
-
     public static void createPdf(String txtFilePath, String fileName) {
         String pdfFilePath = "/Users/mjosefsen/Developer/Java/TxtBundler/" + fileName + ".pdf";
         String fontPath = "/Users/mjosefsen/Developer/Java/TxtBundler/src/main/resources/fonts/Noto-sans.ttf";
 
+        // Constants for page layout
+        int margin = 50;
+        int fontSize = 12;
+        int lineSpacing = 15;
+        int pageWidth = 595; // A4 width in points (72 points per inch)
+        int writableWidth = pageWidth - 2 * margin; // Account for margins
+
         try (PDDocument document = new PDDocument()) {
+            // Load custom font
             PDType0Font font = PDType0Font.load(document, new File(fontPath));
 
-            // Variables for text processing
             BufferedReader reader = new BufferedReader(new FileReader(txtFilePath));
             String line;
-            int lineSpacing = 15;
-            int margin = 50;
             int yPosition = 750;
 
             PDPage page = new PDPage();
             PDPageContentStream contentStream = new PDPageContentStream(document, page);
-            contentStream.setFont(font, 12);
+            contentStream.setFont(font, fontSize);
             contentStream.beginText();
             contentStream.newLineAtOffset(margin, yPosition);
 
             while ((line = reader.readLine()) != null) {
-                // Preprocess the line
-                line = line.replaceAll("[\\uF000-\\uF8FF]", "?"); // Replace private-use characters
-                line = line.replace("\t", "    "); // Replace tabs with spaces
-                line = line.replaceAll("\\p{Cntrl}", ""); // Remove other control characters
+                // Remove or replace non-printable characters (like tabs)
+                line = line.replaceAll("[\\p{Cntrl}&&[^\r\n\t]]", ""); // Remove control characters except newline and tab
+                line = line.replaceAll("\t", "    "); // Replace tabs with spaces
 
-                if (yPosition <= margin) { // Check if we need a new page
-                    contentStream.endText();
-                    contentStream.close();
-                    document.addPage(page);
+                // Remove unsupported characters
+                line = removeUnsupportedCharacters(line, font);
 
-                    page = new PDPage();
-                    contentStream = new PDPageContentStream(document, page);
-                    contentStream.setFont(font, 12);
-                    contentStream.beginText();
-                    contentStream.newLineAtOffset(margin, 750);
-                    yPosition = 750;
+                // Wrap text if it exceeds writable width
+                for (String wrappedLine : wrapText(line, writableWidth, font, fontSize)) {
+                    if (yPosition <= margin) { // Start a new page if necessary
+                        contentStream.endText();
+                        contentStream.close();
+                        document.addPage(page);
+
+                        page = new PDPage();
+                        contentStream = new PDPageContentStream(document, page);
+                        contentStream.setFont(font, fontSize);
+                        contentStream.beginText();
+                        contentStream.newLineAtOffset(margin, 750);
+                        yPosition = 750;
+                    }
+
+                    contentStream.showText(wrappedLine);
+                    contentStream.newLineAtOffset(0, -lineSpacing);
+                    yPosition -= lineSpacing;
                 }
-
-                contentStream.showText(line);
-                contentStream.newLineAtOffset(0, -lineSpacing);
-                yPosition -= lineSpacing;
             }
 
-            // Finalize the current page and save the document
             contentStream.endText();
             contentStream.close();
             document.addPage(page);
@@ -67,5 +75,43 @@ public class CreatePdf {
             e.printStackTrace();
             System.out.println("Error creating PDF: " + e.getMessage());
         }
+    }
+
+    private static String removeUnsupportedCharacters(String text, PDType0Font font) throws IOException {
+        StringBuilder sanitizedText = new StringBuilder();
+        for (char c : text.toCharArray()) {
+            try {
+                // Check if the character can be encoded by the font
+                if (font.getStringWidth(String.valueOf(c)) / 1000 * 12 <= 595) {
+                    sanitizedText.append(c);
+                }
+            } catch (IllegalArgumentException e) {
+                // Skip unsupported characters
+                continue;
+            }
+        }
+        return sanitizedText.toString();
+    }
+
+    private static String[] wrapText(String text, int maxWidth, PDType0Font font, int fontSize) throws IOException {
+        StringBuilder wrappedLine = new StringBuilder();
+        StringBuilder currentLine = new StringBuilder();
+        String[] words = text.split(" ");
+
+        for (String word : words) {
+            String potentialLine = currentLine.length() == 0 ? word : currentLine + " " + word;
+            if (font.getStringWidth(potentialLine) / 1000 * fontSize > maxWidth) {
+                wrappedLine.append(currentLine).append("\n");
+                currentLine = new StringBuilder(word);
+            } else {
+                currentLine.append((currentLine.length() == 0 ? "" : " ") + word);
+            }
+        }
+
+        if (currentLine.length() > 0) {
+            wrappedLine.append(currentLine);
+        }
+
+        return wrappedLine.toString().split("\n");
     }
 }

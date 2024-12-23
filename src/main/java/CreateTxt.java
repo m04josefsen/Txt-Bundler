@@ -13,8 +13,10 @@ public class CreateTxt {
         logger = Logger.getLogger("CreateTxt");
         this.txtQueue = txtQueue;
 
+        // Creating file and adding title
         try {
             newTxt = new FileWriter(fileName + ".txt");
+            newTxt.append(fileName + "\n");
         }
         catch (Exception e) {
             logger.severe("Error while creating file: " + e.getMessage());
@@ -48,7 +50,7 @@ public class CreateTxt {
 
         // Adds files back to original queue and to table of contents
         while(!tempQueue.isEmpty()) {
-            builder.append(tempQueue.peek() + "\n");
+            builder.append("    - " + tempQueue.peek() + "\n");
 
             txtQueue.add(tempQueue.remove());
         }
@@ -64,7 +66,7 @@ public class CreateTxt {
 
         StringBuilder builder = new StringBuilder();
         // Adds heading to each file part
-        builder.append(txtQueue.peek() + "\n");
+        builder.append("\n--- " + txtQueue.peek() + " ---\n");
 
         // Scanner reads throught txt file
         try {
@@ -93,6 +95,8 @@ public class CreateTxt {
     private void writeTxtFile(StringBuilder txtContent) {
         try {
             newTxt.append(txtContent.toString() + "\n");
+            // Seperator
+            newTxt.append("\n-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-\n");
         }
         catch (Exception e) {
             logger.severe("Error while writing to file: " + e.getMessage());

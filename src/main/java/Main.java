@@ -3,9 +3,6 @@ import java.io.File;
 public class Main {
     /*
         TODO:
-        - Add option to read all subdirectories or just main
-        - Add option to create a pdf or txt file bundled
-            - Option to add headings and table of contents
 
         - If txt, table of contents can include line numbers
         - If pdf, normal table of contents

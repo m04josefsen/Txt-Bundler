@@ -16,7 +16,8 @@ public class CreateTxt {
         // Creating file and adding title
         try {
             newTxt = new FileWriter(fileName + ".txt");
-            newTxt.append(fileName + "\n");
+            // Heading / Title
+            newTxt.append(fileName + "\n\n");
         }
         catch (Exception e) {
             logger.severe("Error while creating file: " + e.getMessage());
@@ -72,6 +73,7 @@ public class CreateTxt {
         try {
             Scanner s = new Scanner(file);
 
+            // TODO: maks antall karakterer per linje her
             while(s.hasNextLine()) {
                 builder.append(s.nextLine() + "\n");
             }

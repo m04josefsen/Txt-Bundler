@@ -22,7 +22,11 @@ public class FileService {
         scanner.close();
 
         addTxtToQueue(directory, checkSubdirectories);
-        // TODO: stopp hvis queue er empty
+
+        if(txtQueue.isEmpty()) {
+            System.out.println("No files found in the directory");
+            return;
+        }
 
         CreateTxt createTxt = new CreateTxt();
 
@@ -61,7 +65,7 @@ public class FileService {
                 // System.out.println(fileEntry.getName());
 
                 if(fileEntry.getName().endsWith(".txt")) {
-                    System.out.println(fileEntry.getName());
+                    // System.out.println(fileEntry.getName());
                     txtQueue.add(fileEntry.getAbsolutePath());
                 }
             }

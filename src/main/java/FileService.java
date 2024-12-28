@@ -1,5 +1,8 @@
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -126,5 +129,15 @@ public class FileService {
         String input = scanner.nextLine().toLowerCase();
 
         return input;
+    }
+
+    private static void test() {
+        File f = new File("test.txt");
+        try {
+            FileTime creationTime = (FileTime) Files.getAttribute(Path.of(f.getAbsolutePath()), "creationTime");
+        }
+        catch (Exception e) {
+            System.out.println("lol");
+        }
     }
 }

@@ -13,18 +13,21 @@ public class FileService {
     private static Logger logger;
     private static FileWriter newTxt;
 
-    public static void traverseDirectory(File directory) {
+    public static void traverseDirectory() {
         logger = Logger.getLogger("FileService");
         txtQueue = new LinkedList<>();
 
         Scanner scanner = new Scanner(System.in);
+        String filePath = filePath(scanner);
+        File file = new File(filePath);
+
         boolean checkSubdirectories = checkSubdirectories(scanner);
         boolean includeTableOfContents = includeTableOfContents(scanner);
         boolean createPdf = createPdf(scanner);
         String fileName = fileName(scanner);
         scanner.close();
 
-        addTxtToQueue(directory, checkSubdirectories);
+        addTxtToQueue(file, checkSubdirectories);
 
         if(txtQueue.isEmpty()) {
             System.out.println("No files found in the directory");
@@ -73,6 +76,12 @@ public class FileService {
                 }
             }
         }
+    }
+
+    // Gets the filepath for directory to check for TXTs
+    private static String filePath(Scanner scanner) {
+        System.out.println("Please paste the absolute path of the directory containing the .txt files:");
+        return scanner.nextLine();
     }
 
     // Checks users input if they want to check all subdirectories
